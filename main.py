@@ -62,8 +62,10 @@ def main():
 
     graph_compiled = graph.compile()
 
-    start_state = {"query" : " Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target. Write in Python",
-                   "file_path" : "test.py"}
+    start_state = {
+        "query" : "",
+                   "file_path" : "test.py"
+                   }
 
     for s in graph_compiled.stream(start_state):
         if "__end__" not in s:
