@@ -1,58 +1,131 @@
+from langchain_core.prompts import PromptTemplate
+from pydantics_store import Router, Coder, Summarizer
+from langchain.output_parsers import PydanticOutputParser
 
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # coder system prompt
-code_sys_prompt = (
-"You are a helpful code assistant that can teach a junior developer how to code. Your language of choice is Python/JAVA. Don't explain the code, just generate the code block itself. Include main method with test cases"
-"You might use the retrieved code for reference"
-"\n"
-)
 
-# paper summary system prompt
-qa_system_prompt = (
-"You are an assistant for question-answering tasks"
-"Use the following pieces of retrieved context to answer the question."
-" If you don't know the answer, just say that you don't know."
-"Use three sentences maximum and keep the answer concise."
-"Do not answer anything except the retrieved content."
-"\n"
-)
 
-# router prompt
-decision_prompt = (
-"""You are a language model designed to classify queries based on their type. Your task is to return "CODER" if the query is related to coding, "SUMMARIZER" if the query is a general question, and "END" if the previous messages indicate the question has already been answered. Here are the criteria:
+code_prompt = (
+"""You are a helpful code assistant that can teach a junior developer how to code. Your language of choice is Python/JAVA. Don't explain the code, just generate the code block itself.
+You might use the retrieved code for reference.
+{retrieved_code}
 
-1. **CODER**: The query contains keywords like "code," "program," "algorithm," "debug," or mentions specific programming languages or frameworks.
-2. **SUMMARIZER**: The query does not fit the CODER criteria and is a general question or request for information.
-3. **END**: The context from previous messages clearly indicates that the current question has already been answered.
-4. If the conversation history is empty, choose between SUMMARIZER and CODER based on the nature of the query:
-    - Choose SUMMARIZER if the query requires summarizing information or distilling key points.
-    - Choose CODER if the query requires is a logical question that requires writing code.
-5. If the conversation history is not empty, return END.
-Given the following query and previous messages, determine the appropriate response:
-
-### Previous Messages
-{messages}
-
-### Query
+Query:
 {query}
 
-Respond with either "CODER," "SUMMARIZER," or "END."
+Format instructions:
+{format_instructions}
+
+Generate code based on the query. Include main method. Use the retrieved code as reference if relevant. Respond ONLY with the code in the JSON format specified by the format instructions. Do not include explanations or additional text.
+
 """
 )
 
-code_prompt_template = ChatPromptTemplate.from_messages([
-    ("system", code_sys_prompt),
-    MessagesPlaceholder("retrieved_code"),
-    ("human", "{query}"),
-])
-
-#  actual prompt
-summary_prompt_template = ChatPromptTemplate.from_messages([
-    ("system", qa_system_prompt),
-    MessagesPlaceholder("retrieved_docs"),
-    ("human", "{query}"),
-])
 
 
-decision_prompt_template = ChatPromptTemplate.from_template(decision_prompt)
+# Question answer prompt
+qa_prompt = """
+
+You are a question-answering assistant. Use the provided context to answer the query.
+
+Query:
+{query}
+
+Format instructions:
+{format_instructions}
+
+Context:
+{retrieved_docs}
+"""
+
+# router prompt
+decision_prompt = decision_prompt = (
+    """
+# Format instructions:
+# {format_instructions}
+
+You are a language model designed to classify queries based on their type. Your task is to return a classification based on the following criteria:
+
+CODER: The query contains specific keywords such as "code," "program," "algorithm," "debug," or mentions programming languages or frameworks.
+
+SUMMARIZER: The query is a general question or request for information that does not fall under the CODER category. This includes queries asking for summaries or general information.
+
+END: The query has already been addressed in the previous messages, meaning the context clearly indicates that the answer has been provided before.
+
+Instructions for classification:
+
+If the previous messages indicate that the question has been answered, respond with END.
+If the query involves coding or programming-related content, respond with CODER.
+If the query is general or requests a summary, respond with SUMMARIZER.
+Please follow these rules to determine the appropriate classification:
+
+END: If the context from previous messages clearly indicates that the question has been answered or discussed.
+CODER: If the query involves specific coding tasks, programming languages, or debugging.
+SUMMARIZER: If the query seeks general information or a summary and does not fit the CODER or END criteria.
+
+Previous Messages
+{messages}
+
+Query
+{query}
+
+
+# Your response must be a JSON object with a single "decision" field.
+
+# Where CATEGORY is either CODER, SUMMARIZER, or END.
+
+PAY attention to Previous Messages. Check if it has anything related to the *query*, if so, return END as decision.
+"""
+)
+
+
+#  CODE summarizer prompt
+code_summarizer_prompt = """ You are a code summarizer. Elaborate any code found in the previous messages in detail.
+
+Previous Messages:
+{messages}
+
+Format instructions:
+{format_instructions}
+
+Rules:
+1. Summarize only code from the previous messages.
+2. Provide a elaborate summary of the code's purpose and functionality.
+3. Include a filename for the summary, using .txt extension.
+4. Respond ONLY with a JSON object containing 'summary' and 'filename' fields.
+5. If no code is present, set summary to "No code found" and filename to "empty.txt".
+
+Summarize following these rules. Do not include any text outside the JSON object."""
+
+
+
+# Initializing pydantic parsers for each nodes
+router_parser = PydanticOutputParser(pydantic_object=Router)
+coder_parser = PydanticOutputParser(pydantic_object=Coder)
+summary_parser = PydanticOutputParser(pydantic_object=Summarizer)
+
+
+code_prompt_template = PromptTemplate(
+    template=code_prompt,
+    input_variables=["query", "retrieved_code"],
+    partial_variables={"format_instructions": coder_parser.get_format_instructions()},
+)
+
+summary_prompt_template = PromptTemplate(
+    template=qa_prompt,
+    input_variables=["query", "retrieved_docs"],
+    partial_variables={"format_instructions": summary_parser.get_format_instructions()},
+)
+
+decision_prompt_template = PromptTemplate(
+    template=decision_prompt,
+    input_variables=["query", "messages"],
+    partial_variables={"format_instructions": router_parser.get_format_instructions()},
+)
+
+code_summarizer_prompt_template = PromptTemplate(
+    template=code_summarizer_prompt,
+    input_variables=["messages"],
+    partial_variables={"format_instructions": summary_parser.get_format_instructions()},
+)
