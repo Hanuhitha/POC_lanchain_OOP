@@ -30,8 +30,11 @@ class Node:
         output = self.agent.agent_chain.invoke(state)
         try:
             output = self.agent_parser.parse(output.content)
-        except:
+        except Exception as e:
             # pydantic fails, return to the previous state.
+            state['error'] = f'The output you gave last time had parsing error. Please follow the formatting guidelines. The error was : {e}'
+            state['next'] = self.agent.agent_name # routing to self
+            state['messages'] = state['messages'][:-1]
             return state
         if self.agent.agent_name == "ROUTER":
             state["next"] = output.decision.strip().upper()
@@ -42,6 +45,7 @@ class Node:
                 code_file_path = self.output_dir + "code/" + output.filename
                 state["code_file_path"] = code_file_path
                 self.write_code(code_file_path, output.code)
+            state['next'] = "CODE_SUMMARIZER"
         elif "SUMMARIZER" in self.agent.agent_name:
             state["messages"] = [HumanMessage(content=output.summary)]
             if self.agent.write_output:
@@ -53,7 +57,7 @@ class Node:
                 )
                 state["summary_file_path"] = summary_file_path
                 self.write_code(summary_file_path, output.summary)
-
+            state['next'] = "ROUTER"
         return state
 
     def write_code(self, file_path, ai_output):

@@ -1,0 +1,5 @@
+The provided C++ code solves the combination sum problem where it finds all unique combinations in a given array of candidate numbers that sum up to a target number. The code uses recursion and backtracking to achieve this. It first sorts the candidate numbers, then iterates through the array to find combinations that add up to the target sum. If the current sum exceeds the target, it breaks out of the loop. If the current sum equals the target, it adds the combination to the result vector. The code also ensures that each number in the candidates array is used only once in a combination.
+
+The code consists of two main functions: `combinationSum` and `findCombinations`. The `combinationSum` function initializes the result vector and calls the `findCombinations` function with an empty current combination and the target sum. The `findCombinations` function recursively explores all possible combinations, adding numbers to the current combination as long as the sum does not exceed the target.
+
+The code also includes a main function that tests the `combinationSum` function with a sample input.

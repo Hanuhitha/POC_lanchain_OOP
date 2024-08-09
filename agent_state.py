@@ -9,5 +9,7 @@ class AgentState(TypedDict):
     query: str
     messages: Annotated[Sequence[BaseMessage], operator.add]
     next: str
+    error: str
     code_file_path: str
     summary_file_path: str
+

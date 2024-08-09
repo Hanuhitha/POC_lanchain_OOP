@@ -7,7 +7,8 @@ from langchain.output_parsers import PydanticOutputParser
 
 
 code_prompt = (
-"""You are a helpful code assistant that can teach a junior developer how to code. Your language of choice is Python/JAVA. Don't explain the code, just generate the code block itself.
+"""You are a helpful code assistant that can teach a junior developer how to code. Your language of choice is Python/JAVA/CPP. Don't explain the code, just generate the code block itself.
+
 You might use the retrieved code for reference.
 {retrieved_code}
 
@@ -17,7 +18,12 @@ Query:
 Format instructions:
 {format_instructions}
 
-Generate code based on the query. Include main method. Use the retrieved code as reference if relevant. Respond ONLY with the code in the JSON format specified by the format instructions. Do not include explanations or additional text.
+Take a look at the error {error} that you made last time to get better result now.
+
+Generate code based on the query. Respond ONLY with the code in the JSON format specified by the format instructions. Do not include explanations or additional text.
+Avoid using OOP.
+STRICTLY FOLLOW FORMATTING INSTRUCTIONS.
+
 
 """
 )
@@ -35,49 +41,75 @@ Query:
 Format instructions:
 {format_instructions}
 
+"Additionally, review the previous error message to ensure the output is formatted correctly, if required:
+{error}"
+
 Context:
 {retrieved_docs}
 """
 
 # router prompt
-decision_prompt = decision_prompt = (
-    """
-# Format instructions:
-# {format_instructions}
-
-You are a language model designed to classify queries based on their type. Your task is to return a classification based on the following criteria:
-
-CODER: The query contains specific keywords such as "code," "program," "algorithm," "debug," or mentions programming languages or frameworks.
-
-SUMMARIZER: The query is a general question or request for information that does not fall under the CODER category. This includes queries asking for summaries or general information.
-
-END: The query has already been addressed in the previous messages, meaning the context clearly indicates that the answer has been provided before.
-
-Instructions for classification:
-
-If the previous messages indicate that the question has been answered, respond with END.
-If the query involves coding or programming-related content, respond with CODER.
-If the query is general or requests a summary, respond with SUMMARIZER.
-Please follow these rules to determine the appropriate classification:
-
-END: If the context from previous messages clearly indicates that the question has been answered or discussed.
-CODER: If the query involves specific coding tasks, programming languages, or debugging.
-SUMMARIZER: If the query seeks general information or a summary and does not fit the CODER or END criteria.
-
-Previous Messages
-{messages}
-
-Query
-{query}
-
-
-# Your response must be a JSON object with a single "decision" field.
-
-# Where CATEGORY is either CODER, SUMMARIZER, or END.
-
-PAY attention to Previous Messages. Check if it has anything related to the *query*, if so, return END as decision.
+decision_prompt = (
 """
+You are a router. You route to nodes based on the query you receive. You can route to one of the three options.
+Option 1 : CODER
+Option 2 : SUMMARIZER
+Option 3 : END
+
+
+Choose END if {code_file_path} has a file path. Choose END if  {summary_file_path} has a file path.
+
+query : {query}
+message history : {messages}
+format instructions : {format_instructions}
+
+STRICTLY Adhere to format instructions. Do not return any pretext to the output.
+"""
+
 )
+
+
+# (
+#     """
+# # Format instructions:
+# # {format_instructions}
+
+# You are a language model designed to classify queries based on their type. Your task is to return a classification based on the following criteria:
+
+# CODER: The query contains specific keywords such as "code," "program," "algorithm," "debug," or mentions programming languages or frameworks.
+
+# SUMMARIZER: The query is a general question or request for information that does not fall under the CODER category. This includes queries asking for summaries or general information.
+
+# END: The query has already been addressed in the previous messages, meaning the context clearly indicates that the answer has been provided before.
+
+# Instructions for classification:
+
+# If the previous messages indicate that the question has been answered, respond with END.
+# If the query involves coding or programming-related content, respond with CODER.
+# If the query is general or requests a summary, respond with SUMMARIZER.
+# Please follow these rules to determine the appropriate classification:
+
+# END: If the context from previous messages clearly indicates that the question has been answered or discussed.
+# CODER: If the query involves specific coding tasks, programming languages, or debugging.
+# SUMMARIZER: If the query seeks general information or a summary and does not fit the CODER or END criteria.
+
+# Previous Messages
+# {messages}
+
+# "Additionally, review the previous error message to ensure the output is formatted correctly, if required:
+# {error}"
+
+# Query
+# {query}
+
+
+# # Your response must be a JSON object with a single "decision" field.
+
+# # Where CATEGORY is either CODER, SUMMARIZER, or END.
+
+# PAY attention to Previous Messages. Check if it has anything related to the *query*, if so, return END as decision.
+# """
+# )
 
 
 #  CODE summarizer prompt
@@ -88,6 +120,9 @@ Previous Messages:
 
 Format instructions:
 {format_instructions}
+
+"Additionally, review the previous error message to ensure the output is formatted correctly, if required:
+{error}"
 
 Rules:
 1. Summarize only code from the previous messages.

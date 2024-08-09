@@ -17,28 +17,33 @@ if code_language != "None":
 current_state = None
 if st.button("Submit"):
     if query:
-        with st.status("Processing user query"):
+        with st.status("Thinking.."):
             try:
                 for s in graph.stream({"query": query}):
                     current_state = list(s.keys())[0]
                     if "__end__" not in s:
-                        st.write(current_state)
+                        st.write(f'Entering : {current_state} node')
                     else:
-                        st.write(current_state)
+                        st.write(f'Entering : {current_state} node')
                         break
             except:
                 st.error("error occured! Cannot process request. Retry with different prompt.")
         try:
             current_state_dict = s[current_state]
             code_file_path = s[current_state]["code_file_path"]
+            summary_file_path = s[current_state]["summary_file_path"]
             
+            if code_file_path:
             
-            code_file = read_file(code_file_path)
-            st.code(code_file)
-
-            summary = read_file(s[current_state]["summary_file_path"])
+                code_file = read_file(code_file_path)
+                st.header("Generated Code")
+                st.code(code_file)
             
-            st.success("Done!")
+            summary = read_file(summary_file_path)
+            
+            st.header("Generated Summary")
             st.text(summary)
+            
+                
         except:
-            st.error(s)
+            st.error("LLM unable to process the request")

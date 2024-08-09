@@ -24,3 +24,7 @@ To Run the code :
 streamlit run app.py
 
 ```
+#### References
+ [Langchain](https://github.com/langchain-ai/langchain)
+ [Ollama - llama3](https://ollama.com/library/llama3)
+ [pydantic](https://docs.pydantic.dev/latest/)

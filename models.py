@@ -2,7 +2,7 @@ from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaEmbeddings
 
 
-def create_chat_model(model_name="openhermes"):
+def create_chat_model(model_name="llama3"):
     """Method returns the chat model
 
     Args:

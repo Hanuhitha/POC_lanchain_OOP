@@ -17,7 +17,7 @@ from langgraph.graph import END, StateGraph, START
 
 
 
-def safe_graph(graph):
+def save_graph(graph):
     try:
         # Get the image data
         img_data = graph.get_graph().draw_mermaid_png()
@@ -105,31 +105,31 @@ def execute_graph():
     #  start edge
     graph.add_edge(START, "router")
 
-    conditional_mapping = {"SUMMARIZER": "Summarizer", "CODER": "Coder", "END": END}
+    conditional_mapping = {"SUMMARIZER": "Summarizer", "CODER": "Coder", "END": END, "ROUTER":"router","CODE_SUMMARIZER": "Code_Summarizer"}
     graph.add_conditional_edges("router", lambda x: x["next"], conditional_mapping)
-    graph.add_edge("Summarizer", "router")
-    # coder should always go to the summarizer to summarize the code
-    graph.add_edge("Coder", "Code_Summarizer")
+    graph.add_conditional_edges("Summarizer", lambda x: x["next"], conditional_mapping)
+    graph.add_conditional_edges("Coder", lambda x: x["next"], conditional_mapping)
     graph.add_edge("Code_Summarizer", "router")
 
     graph_compiled = graph.compile()
 
     # safe_graph(graph_compiled)
     # local testing code
-    # start_state = {
-    #     "query": "Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target. Write in Python",
-    # }
+    start_state = {
+        "query": """Given s1, s2, s3, find whether s3 is formed by the interleaving of s1 and s2. Write code in python programming language.
+    """
+    }
 
-    # for s in graph_compiled.stream(start_state):
-    #     if "__end__" not in s:
-    #         print(s)
-    #         print("----")
-    #     else:
-    #         final_state = s
-    #         break
+    for s in graph_compiled.stream(start_state):
+        if "__end__" not in s:
+            print(s)
+            print("----")
+        else:
+            final_state = s
+            break
 
     return graph_compiled
 
 
-# execute_graph()
+execute_graph()
 
