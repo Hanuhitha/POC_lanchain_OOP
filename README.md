@@ -11,7 +11,7 @@ In this POC, we build a multi agent langchain for an intelligent Summarizer and 
 The Mermaid diagram of the graph looks as follows:
 
 
-![Graph](./flow.png)
+![Graph](./flow_new.png)
 
 
 Screenshots of streamlit app
