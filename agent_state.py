@@ -12,4 +12,5 @@ class AgentState(TypedDict):
     error: str
     code_file_path: str
     summary_file_path: str
+    audio_file_path: str
 

@@ -1,1 +1,0 @@
-The code creates a UDP socket server in C++ that listens for incoming messages from clients on port 8888. It binds the socket to the address and port, receives data from the client using recvfrom function, prints the received message, and sends a response back to the client.

@@ -1,0 +1,13 @@
+The Python code defines a function `findMedianSortedArrays` that calculates the median of two sorted arrays, `nums1` and `nums2`. It efficiently achieves this with a time complexity of O(log(m+n)), where m and n are the lengths of the arrays. 
+
+The algorithm utilizes binary search to find the partition points in both arrays that divide them into two halves with equal or nearly equal elements.  It then compares the maximum element of the left partitions and the minimum element of the right partitions to determine the median.
+
+Here's a breakdown:
+
+1. **Handle Unequal Lengths:** If `nums1` is longer than `nums2`, it swaps them to ensure `nums1` is always the shorter array. This simplifies subsequent calculations.
+
+2. **Binary Search:** The code performs binary search on the shorter array (`nums1`) to find a partition point `i`.  The corresponding partition point `j` in `nums2` is calculated to maintain an equal or nearly equal number of elements on both sides of the partitions.
+
+3. **Adjust Partition Points:** Based on comparisons between elements at the partition points, the search space for `i` is narrowed down. If `nums2[j-1]` is greater than `nums1[i]`, it means `i` is too small and needs to be increased. Conversely, if `nums1[i-1]` is greater than `nums2[j]`, `i` is too big and needs to be decreased.
+
+4. **Determine Median:** Once the correct partition points are found, the maximum element of the left partitions (`max_left`) and the minimum element of the right partitions (`min_right`) are identified. The median is then calculated based on whether the total number of elements is odd or even.

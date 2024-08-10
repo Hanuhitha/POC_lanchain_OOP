@@ -2,8 +2,10 @@ from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaEmbeddings
 
 
-def create_chat_model(model_name="llama3"):
+def create_chat_model(model_name="gemma2:9b-instruct-q6_K"):
     """Method returns the chat model
+    llama3:instruct
+    gemma2:9b-instruct-q6_K
 
     Args:
         model_name (str, optional): Name of the chat model to be initialized. This only supports free ollama models. Defaults to 'openhermes'.

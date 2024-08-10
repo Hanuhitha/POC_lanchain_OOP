@@ -1,0 +1,1 @@
+Performer models are a type of transformer model that aim to address the computational challenges of traditional attention mechanisms. They achieve this by replacing standard attention with low-rank kernel approximations, allowing for more efficient scaling to larger datasets and model sizes.

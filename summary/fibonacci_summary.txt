@@ -1,0 +1,7 @@
+The Python code defines a function called `fibonacci(n)` that generates and prints the Fibonacci sequence up to n terms. 
+
+It initializes two variables, `a` and `b`, with 0 and 1 respectively, representing the first two numbers in the sequence. Then, it iterates `n` times using a `for` loop. In each iteration:
+- It prints the current value of `a`. 
+- It updates `a` to the value of `b`, and `b` to the sum of the previous `a` and `b`, effectively calculating the next Fibonacci number.
+
+Finally, it calls the `fibonacci(10)` function to generate and print the first 10 Fibonacci numbers.

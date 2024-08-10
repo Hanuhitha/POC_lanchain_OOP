@@ -40,3 +40,15 @@ class Summarizer(BaseModel):
 
     class Config:
         extra = Extra.forbid  # Forbid extra fields not defined in the model
+
+
+class Audio(BaseModel):
+    """Audio summary Pydantic class.
+        Args:
+            name (boostrl) : Name of the tools selected by the agent.  
+            arguments(dict) : dictionary of the arguments.
+            filename(str): filename to store the audio file.
+        """
+    name: str = Field(description="Name of the tools selected by the agent")
+    arguments: dict = Field(description="dictionary of the arguments.")
+    filename: str = Field(description="filename to store the audio file.")

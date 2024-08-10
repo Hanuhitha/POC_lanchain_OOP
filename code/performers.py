@@ -1,1 +1,0 @@
-performers = ["John", "Jane", "Bob"]

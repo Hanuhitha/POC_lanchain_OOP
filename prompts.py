@@ -1,6 +1,7 @@
 from langchain_core.prompts import PromptTemplate
-from pydantics_store import Router, Coder, Summarizer
+from pydantics_store import Router, Coder, Summarizer, Audio
 from langchain.output_parsers import PydanticOutputParser
+from tools import text_to_audio
 
 
 # coder system prompt
@@ -59,6 +60,9 @@ Option 3 : END
 
 Choose END if {code_file_path} has a file path. Choose END if  {summary_file_path} has a file path.
 
+Choose END  if message history has code in it.
+Choose END if the message history has summary in it.
+If the messages have message from CODER or SUMMARIZER, Choose END.
 query : {query}
 message history : {messages}
 format instructions : {format_instructions}
@@ -69,47 +73,7 @@ STRICTLY Adhere to format instructions. Do not return any pretext to the output.
 )
 
 
-# (
-#     """
-# # Format instructions:
-# # {format_instructions}
 
-# You are a language model designed to classify queries based on their type. Your task is to return a classification based on the following criteria:
-
-# CODER: The query contains specific keywords such as "code," "program," "algorithm," "debug," or mentions programming languages or frameworks.
-
-# SUMMARIZER: The query is a general question or request for information that does not fall under the CODER category. This includes queries asking for summaries or general information.
-
-# END: The query has already been addressed in the previous messages, meaning the context clearly indicates that the answer has been provided before.
-
-# Instructions for classification:
-
-# If the previous messages indicate that the question has been answered, respond with END.
-# If the query involves coding or programming-related content, respond with CODER.
-# If the query is general or requests a summary, respond with SUMMARIZER.
-# Please follow these rules to determine the appropriate classification:
-
-# END: If the context from previous messages clearly indicates that the question has been answered or discussed.
-# CODER: If the query involves specific coding tasks, programming languages, or debugging.
-# SUMMARIZER: If the query seeks general information or a summary and does not fit the CODER or END criteria.
-
-# Previous Messages
-# {messages}
-
-# "Additionally, review the previous error message to ensure the output is formatted correctly, if required:
-# {error}"
-
-# Query
-# {query}
-
-
-# # Your response must be a JSON object with a single "decision" field.
-
-# # Where CATEGORY is either CODER, SUMMARIZER, or END.
-
-# PAY attention to Previous Messages. Check if it has anything related to the *query*, if so, return END as decision.
-# """
-# )
 
 
 #  CODE summarizer prompt
@@ -135,10 +99,39 @@ Summarize following these rules. Do not include any text outside the JSON object
 
 
 
+audio_summary_prompt = (
+    """
+    You are an agent with access to the following tools:
+    {format_tools}
+
+    If the messages have SUMMARIZER data, then only you need to generate audio summary.
+    Else, do not choose the tool.
+    Generate a filename depending on the context.
+
+    Select the tool based on the input message history. 
+    {messages}
+    The output MUST be json with formatting instructions given below:
+
+    Given the user input, return the name and input of the tool to use.
+    Return your response as a JSON blob with 'name' and 'arguments' keys.
+    The value associated with the 'arguments' key should be a dictionary of parameters
+
+    Past errors:
+    {error}
+    
+    STRICTLY ADHERE TO THE FORMATIING RULES. DO NOT GIVE ANYTHING OTHER THAN THE JSON OUTPUT.
+    The output will be parsed using JsonOutputParser() package from langchain. Be sure to generate
+    the output such that it works with the JsonOutputParser()
+
+    """
+
+)
+
 # Initializing pydantic parsers for each nodes
 router_parser = PydanticOutputParser(pydantic_object=Router)
 coder_parser = PydanticOutputParser(pydantic_object=Coder)
 summary_parser = PydanticOutputParser(pydantic_object=Summarizer)
+audio_parser = PydanticOutputParser(pydantic_object=Audio)
 
 
 code_prompt_template = PromptTemplate(
@@ -164,3 +157,5 @@ code_summarizer_prompt_template = PromptTemplate(
     input_variables=["messages"],
     partial_variables={"format_instructions": summary_parser.get_format_instructions()},
 )
+
+

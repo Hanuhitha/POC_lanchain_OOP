@@ -2,6 +2,7 @@ from models import create_chat_model, create_embedding_model
 from agent import Agent
 from agent_state import AgentState
 from create_rag import CoderRag, SummaryRag
+from langchain_core.output_parsers import JsonOutputParser
 from PIL import Image
 from node import Node
 from prompts import (
@@ -9,11 +10,16 @@ from prompts import (
     summary_prompt_template,
     decision_prompt_template,
     code_summarizer_prompt_template,
+    audio_summary_prompt,
     router_parser,
     summary_parser,
     coder_parser,
+
 )
 from langgraph.graph import END, StateGraph, START
+from tools import ToolAgent, text_to_audio
+from langchain.tools.render import render_text_description
+
 
 
 
@@ -86,6 +92,10 @@ def execute_graph():
         write_output=True,
     )
 
+    audio_agent = ToolAgent(llm=llm,prompt=audio_summary_prompt,write_output=True,agent_name="AUDIO_SUMMARIZER",
+                            parser=JsonOutputParser(),tools= [text_to_audio], rendered_tools=
+                              render_text_description([text_to_audio]))
+
     # defining nodes
 
     router_node = Node(agent=router_agent, agent_parser=router_parser)
@@ -93,6 +103,7 @@ def execute_graph():
     summary_node = Node(agent=document_summary_agent, agent_parser=summary_parser)
     coder_node = Node(agent=coder_agent, agent_parser=coder_parser)
     code_summary_node = Node(agent=code_summary_agent, agent_parser=summary_parser)
+    audio_summary_node = Node(agent=audio_agent, agent_parser=False)
 
     #  langraph
     graph = StateGraph(AgentState)
@@ -101,35 +112,38 @@ def execute_graph():
     graph.add_node("Coder", coder_node)
     graph.add_node("router", router_node)
     graph.add_node("Code_Summarizer", code_summary_node)
+    graph.add_node("Audio_Summarizer", audio_summary_node)
 
     #  start edge
     graph.add_edge(START, "router")
 
-    conditional_mapping = {"SUMMARIZER": "Summarizer", "CODER": "Coder", "END": END, "ROUTER":"router","CODE_SUMMARIZER": "Code_Summarizer"}
+    conditional_mapping = {"SUMMARIZER": "Summarizer", "CODER": "Coder", "END": END, "ROUTER":"router","CODE_SUMMARIZER": "Code_Summarizer", "AUDIO_SUMMARIZER":"Audio_Summarizer"}
     graph.add_conditional_edges("router", lambda x: x["next"], conditional_mapping)
     graph.add_conditional_edges("Summarizer", lambda x: x["next"], conditional_mapping)
     graph.add_conditional_edges("Coder", lambda x: x["next"], conditional_mapping)
-    graph.add_edge("Code_Summarizer", "router")
+    graph.add_conditional_edges("Code_Summarizer", lambda x: x["next"], conditional_mapping)
+    graph.add_conditional_edges("Audio_Summarizer", lambda x: x["next"], conditional_mapping)
 
+    
     graph_compiled = graph.compile()
 
     # safe_graph(graph_compiled)
     # local testing code
-    start_state = {
-        "query": """Given s1, s2, s3, find whether s3 is formed by the interleaving of s1 and s2. Write code in python programming language.
-    """
-    }
+    # start_state = {
+    #     "query": """what is bert? Write a summary.
+    # """
+    # }
 
-    for s in graph_compiled.stream(start_state):
-        if "__end__" not in s:
-            print(s)
-            print("----")
-        else:
-            final_state = s
-            break
+    # for s in graph_compiled.stream(start_state):
+    #     if "__end__" not in s:
+    #         print(s)
+    #         print("----")
+    #     else:
+    #         final_state = s
+    #         break
 
     return graph_compiled
 
 
-execute_graph()
+# execute_graph()
 

@@ -5,12 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python:Streamlit",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
+            "module": "streamlit",
+            "args": [
+                "run",
+                "${file}"
+            ],
         }
+    
     ]
 }
