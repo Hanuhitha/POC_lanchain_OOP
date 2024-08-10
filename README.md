@@ -28,3 +28,5 @@ streamlit run app.py
  - [Langchain](https://github.com/langchain-ai/langchain)
  - [Ollama - llama3](https://ollama.com/library/llama3)
  - [pydantic](https://docs.pydantic.dev/latest/)
+ - [Leetcode](https://github.com/Garvit244/Leetcode/tree/master/1-100q)
+ - [Toolchain](https://medium.com/pythoneers/power-up-ollama-chatbots-with-tools-113ed8229a7a)
