@@ -145,5 +145,5 @@ def execute_graph():
     return graph_compiled
 
 
-# execute_graph()
+execute_graph()
 
