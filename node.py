@@ -25,10 +25,9 @@ class Node:
                     AgentState: state dict
         """
         query = state["query"]
+        output = self.agent.agent_chain.invoke(state)
         try:
-            output = self.agent.agent_chain.invoke(state)
-            if not self.agent.agent_name == 'AUDIO_SUMMARIZER':
-                output = self.agent_parser.parse(output.content)
+            output = self.agent_parser.parse(output.content)
         except Exception as e:
             # pydantic fails, return to the previous state.
             state['error'] = f'The output you gave last time had parsing error. Please follow the formatting guidelines. The error was : {e}'
@@ -45,9 +44,6 @@ class Node:
                 state["code_file_path"] = code_file_path
                 self.write_code(code_file_path, output.code)
             state['next'] = "CODE_SUMMARIZER"
-        elif self.agent.agent_name == "AUDIO_SUMMARIZER":
-            state["next"] = "ROUTER"
-            state['audio_file_path'] = output['audio_file_path']
         elif "SUMMARIZER" in self.agent.agent_name:
             state["messages"] = [HumanMessage(content="SUMMARIZER :"+output.summary)]
             if self.agent.write_output:
@@ -59,10 +55,8 @@ class Node:
                 )
                 state["summary_file_path"] = summary_file_path
                 self.write_code(summary_file_path, output.summary)
-            if 'AUDIO' not in self.agent.agent_name and  'CODE' not in self.agent.agent_name:
-                state['next'] = 'AUDIO_SUMMARIZER'
-            else:
-                state['next'] = "ROUTER"
+           
+            state['next'] = "ROUTER"
         return state
 
     def write_code(self, file_path, ai_output):
