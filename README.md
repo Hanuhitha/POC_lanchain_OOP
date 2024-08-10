@@ -15,8 +15,8 @@ The Mermaid diagram of the graph looks as follows:
 
 
 Screenshots of streamlit app
-![streamlit app](./1.png)
-![streamlit app](./2.png)
+![streamlit app](./1_new.png)
+![streamlit app](./2_new.png)
 
 
 To Run the code :
@@ -25,6 +25,6 @@ streamlit run app.py
 
 ```
 #### References
- [Langchain](https://github.com/langchain-ai/langchain)
- [Ollama - llama3](https://ollama.com/library/llama3)
- [pydantic](https://docs.pydantic.dev/latest/)
+ - [Langchain](https://github.com/langchain-ai/langchain)
+ - [Ollama - llama3](https://ollama.com/library/llama3)
+ - [pydantic](https://docs.pydantic.dev/latest/)
