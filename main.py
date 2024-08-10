@@ -127,7 +127,7 @@ def execute_graph():
     
     graph_compiled = graph.compile()
 
-    # save_graph(graph_compiled)
+    save_graph(graph_compiled)
     # local testing code
     # start_state = {
     #     "query": """what is bert? Write a summary.
@@ -145,5 +145,5 @@ def execute_graph():
     return graph_compiled
 
 
-execute_graph()
+# execute_graph()
 
