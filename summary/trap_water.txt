@@ -1,5 +1,0 @@
-The Python code calculates the amount of rainwater that can be trapped between bars in an elevation map.  
-
-It works by first finding the maximum height of a bar to the left and right of each bar in the elevation map. These are stored in the `left_max` and `right_max` arrays respectively. 
-
-Then, for each bar, it calculates the amount of water that can be trapped above it as the minimum of the left and right maximum heights minus the height of the current bar.  The total trapped water is the sum of these values for all bars.

@@ -1,1 +1,0 @@
-This Spring Boot controller defines a REST endpoint `/employees` that fetches employee data from an SQL database.  It uses a `JdbcTemplate` to execute a SQL query selecting the 'name' and 'dob' columns from the 'Employee' table. The result is converted to a string representation and returned as the API response.

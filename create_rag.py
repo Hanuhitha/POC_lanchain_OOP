@@ -58,12 +58,12 @@ class CoderRag(Rag):
 
                 for d in doc:
                     question = []
-                    for i,x in enumerate(d.page_content.split()):
+                    for k,x in enumerate(d.page_content.split()):
                         if "class" in x:
                             break
                         question.append(x)
                     res = "".join(question)
-                    d.metadata = {"code": "".join(d.page_content.split()[i:])}
+                    d.metadata = {"code": "".join(d.page_content.split()[k:])}
                     d.page_content = res
 
                 splitted_doc.extend(text_splitter.split_documents(doc))
@@ -96,7 +96,7 @@ class SummaryRag(Rag):
         super().__init__(source, destination, embeddings)
 
     def create_db(self):
-        """Method generates the RAG for CODE
+        """Method generates the RAG for Summary
 
         Returns:
             Croma: return a chroma db

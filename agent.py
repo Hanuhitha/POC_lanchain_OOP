@@ -20,13 +20,13 @@ class Agent:
 
 
     def retrieve_data(self,data):
-        """A RAG data retrieval method for runnable
+        """A data retrieval method for runnable
 
         Args:
             data (dict): Contains RAG extraction specific data like query.
 
         Returns:
-           data (dict): Input dictionary populated with RAG specific outputs
+           data (dict): dictionary populated with RAG specific outputs
         """
         query =  data['query']
         retrieved_doc = self.retriever.invoke(query)

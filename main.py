@@ -48,7 +48,7 @@ def execute_graph():
     # rags
 
     coder_db = CoderRag(
-        source="Leetcode/1-100q",
+        source="Leetcode",
         destination="./chroma_db_code",
         embeddings=embeddings,
     ).create_db()
@@ -59,13 +59,13 @@ def execute_graph():
         embeddings=embeddings,
     ).create_db()
 
-    #  retriver
+    #  retriever
     code_retriever = coder_db.as_retriever(
         search_type="similarity", search_kwargs={"k": 1}
     )
 
     summary_retriever = summary_db.as_retriever(
-        search_type="similarity", search_kwargs={"k": 1}
+        search_type="similarity", search_kwargs={"k": 5}
     )
 
     #  defining agents (chain)
@@ -92,9 +92,13 @@ def execute_graph():
         write_output=True,
     )
 
-    audio_agent = ToolAgent(llm=llm,prompt=audio_summary_prompt,write_output=True,agent_name="AUDIO_SUMMARIZER",
-                            parser=JsonOutputParser(),tools= [text_to_audio], rendered_tools=
-                              render_text_description([text_to_audio]))
+    audio_agent = ToolAgent(llm=llm,
+                            prompt=audio_summary_prompt,
+                            write_output=True,
+                            agent_name="AUDIO_SUMMARIZER",
+                            parser=JsonOutputParser(),
+                            tools= [text_to_audio], 
+                            rendered_tools= render_text_description([text_to_audio]))
 
     # defining nodes
 
@@ -117,12 +121,17 @@ def execute_graph():
     #  start edge
     graph.add_edge(START, "router")
 
-    conditional_mapping = {"SUMMARIZER": "Summarizer", "CODER": "Coder", "END": END, "ROUTER":"router","CODE_SUMMARIZER": "Code_Summarizer", "AUDIO_SUMMARIZER":"Audio_Summarizer"}
-    graph.add_conditional_edges("router", lambda x: x["next"], conditional_mapping)
-    graph.add_conditional_edges("Summarizer", lambda x: x["next"], conditional_mapping)
-    graph.add_conditional_edges("Coder", lambda x: x["next"], conditional_mapping)
-    graph.add_conditional_edges("Code_Summarizer", lambda x: x["next"], conditional_mapping)
-    graph.add_conditional_edges("Audio_Summarizer", lambda x: x["next"], conditional_mapping)
+    conditional_mapping_router = {"SUMMARIZER": "Summarizer", "CODER": "Coder", "END": END, "ROUTER":"router"}
+    conditional_mapping_summarizer = { "AUDIO_SUMMARIZER":"Audio_Summarizer","SUMMARIZER": "Summarizer"}
+    conditional_mapping_audio_summarizer = { "AUDIO_SUMMARIZER":"Audio_Summarizer", "ROUTER":"router"}
+    conditional_mapping_coder = { "CODE_SUMMARIZER":"Code_Summarizer",'CODER':'Coder'}
+    conditional_mapping_code_summarizer = {"CODE_SUMMARIZER":"Code_Summarizer", "ROUTER":"router"}
+    
+    graph.add_conditional_edges("router", lambda x: x["next"], conditional_mapping_router)
+    graph.add_conditional_edges("Summarizer", lambda x: x["next"],conditional_mapping_summarizer )
+    graph.add_conditional_edges("Coder", lambda x: x["next"], conditional_mapping_coder)
+    graph.add_conditional_edges("Code_Summarizer", lambda x: x["next"], conditional_mapping_code_summarizer)
+    graph.add_conditional_edges("Audio_Summarizer", lambda x: x["next"], conditional_mapping_audio_summarizer)
 
     
     graph_compiled = graph.compile()
@@ -130,7 +139,7 @@ def execute_graph():
     # save_graph(graph_compiled)
     # local testing code
     # start_state = {
-    #     "query": """what is bert? Write a summary.
+    #     "query": """Explain performer models? write a summary
     # """
     # }
 
@@ -145,5 +154,5 @@ def execute_graph():
     return graph_compiled
 
 
-execute_graph()
+# execute_graph()
 
