@@ -1,0 +1,5 @@
+The provided Java code implements a regular expression matching algorithm using dynamic programming. It takes two strings as input: `s` (the input string) and `p` (the pattern). The pattern can contain special characters '.' (matches any single character) and '*' (matches zero or more of the preceding element).  
+
+The code utilizes a 2D boolean array `dp` to store matching results for subproblems. `dp[i][j]` is true if the substring of `s` from index 0 to `i-1` matches the substring of `p` from index 0 to `j-1`. 
+
+The algorithm initializes `dp[0][0]` to true (empty string matches empty pattern) and handles patterns starting with '*' by considering previous subproblems. It then iterates through the strings, comparing characters and applying the rules for '.' and '*'. If a match is found, it updates `dp[i][j]` based on previous subproblem results. Finally, it returns `dp[s.length()][p.length()]`, indicating whether the entire input string matches the pattern.
