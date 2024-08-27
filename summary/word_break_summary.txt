@@ -1,0 +1,7 @@
+The provided Python code implements two functions: `wordBreak` and `generateSentences`.  
+
+The `wordBreak` function determines if a given string `s` can be segmented into words present in a dictionary `wordDict`. It utilizes dynamic programming to efficiently check all possible segmentations. The function returns `True` if a valid segmentation exists, otherwise `False`. 
+
+The `generateSentences` function takes the input string `s` and the `wordDict` and generates all possible sentences by recursively breaking down the string into words from the dictionary. It uses backtracking to explore different segmentation possibilities and appends valid sentences to a result list.  
+
+In essence, this code solves the classic word break problem, finding all possible ways to construct a sentence from a given string using words from a provided dictionary.

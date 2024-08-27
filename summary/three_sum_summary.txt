@@ -1,0 +1,29 @@
+The Python code defines a function called `threeSum` that takes an integer array `nums` as input and returns a list of unique triplets from the array that sum up to zero. 
+
+Here's a breakdown:
+
+1. **Initialization:**
+   - It starts by creating an empty list called `result` to store the valid triplets.
+   - The input array `nums` is sorted in ascending order using `nums.sort()`. This sorting step is crucial for efficiently finding triplets.
+
+2. **Iterating through Potential First Elements:**
+   - The outer loop iterates through the array from index 0 to `len(nums) - 2`.  Each element at index `i` is considered as a potential first element of a triplet.
+   - It includes a check (`if i > 0 and nums[i] == nums[i - 1]: continue`) to skip duplicate elements. This ensures that we don't generate duplicate triplets.
+
+3. **Two-Pointer Approach:**
+   - For each `i`, two pointers, `left` and `right`, are initialized. `left` starts at `i + 1` (the next element after `i`), and `right` starts at the end of the array (`len(nums) - 1`).
+   - The `while left < right:` loop implements a two-pointer technique to efficiently find the remaining two elements of the triplet.
+
+4. **Calculating the Sum:**
+   - Inside the loop, the sum `total` of the three elements (`nums[i]`, `nums[left]`, and `nums[right]`) is calculated.
+
+5. **Adjusting Pointers:**
+   - If `total` is less than 0, it means we need a larger sum, so `left` is incremented to consider a larger element.
+   - If `total` is greater than 0, we need a smaller sum, so `right` is decremented.
+   - If `total` is equal to 0, we've found a valid triplet! It's appended to the `result` list.
+
+6. **Handling Duplicates:**
+   - After finding a valid triplet, the code includes checks (`while left < right and nums[left] == nums[left + 1]: left += 1` and `while left < right and nums[right] == nums[right - 1]: right -= 1`) to skip over any duplicate elements at `left` and `right` positions. This ensures that we don't add duplicate triplets to the result.
+
+7. **Returning the Result:**
+   - Finally, the function returns the `result` list containing all the unique triplets that sum up to zero.

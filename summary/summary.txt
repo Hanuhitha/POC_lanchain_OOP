@@ -1,0 +1,11 @@
+The Python function `firstMissingPositive(nums)` aims to find the smallest positive integer that is absent from a given unsorted integer array `nums`.  It achieves this with an O(n) time complexity and constant O(1) auxiliary space. 
+
+Here's a breakdown:
+
+1. **Initialization:** It determines the length of the input array `nums` and creates a boolean list `present` of size `n+1`, initialized to `False`. This list will be used to track the presence of positive integers from 1 to `n`. 
+
+2. **Marking Presence:** The code iterates through each number `num` in the input array `nums`. If `num` falls within the range of 1 to `n`, it sets the corresponding index `num` in the `present` list to `True`, indicating that this positive integer is present in the array. 
+
+3. **Finding the Missing Positive:**  The code then iterates through the `present` list from index 1 to `n`. If it encounters an index `i` where `present[i]` is `False`, it means the integer `i` is missing from the input array, and the function returns `i` as the smallest missing positive integer. 
+
+4. **Handling All Positives Present:** If the loop completes without finding a missing positive, it implies that all positive integers from 1 to `n` are present in the array. In this case, the function returns `n+1`, which is the next positive integer after `n`. 

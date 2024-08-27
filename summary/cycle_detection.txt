@@ -1,0 +1,15 @@
+The Python code implements a function called `detectCycle` that aims to find the starting node of a cycle within a linked list.  It utilizes the fast and slow pointer approach. 
+
+Here's a breakdown:
+
+1. Initialization: Two pointers, `slow` and `fast`, are initialized to the head of the linked list.
+2. Traversal: The code iterates through the list using the pointers. In each iteration:
+   - `slow` moves one node forward (`slow = slow.next`).
+   - `fast` moves two nodes forward (`fast = fast.next.next`).
+3. Cycle Detection: If a cycle exists, `fast` will eventually catch up to `slow` (i.e., `slow == fast`).
+4. Finding the Cycle Start: 
+   - Once a cycle is detected, `slow` is reset to the head of the list.
+   - Both `slow` and `fast` are moved forward one node at a time until they meet again. The meeting point is the start of the cycle.
+5. No Cycle: If `fast` reaches the end of the list (becomes `None` or its next pointer is `None`), it indicates there's no cycle, and `None` is returned.
+
+6. Return Value: The function returns the node where the cycle begins if a cycle exists; otherwise, it returns `None`. 

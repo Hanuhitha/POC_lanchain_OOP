@@ -1,0 +1,19 @@
+The Python code implements a wildcard pattern matching algorithm. It utilizes dynamic programming to determine if a given input string (s) matches a pattern (p) containing '?' and '*'.  
+
+Here's a breakdown:
+
+1. **Initialization:**
+   - A 2D boolean array `dp` is created, representing all possible substrings of `s` against `p`. 
+   - `dp[0][0]` is set to `True` as an empty string matches an empty pattern.
+   - If the pattern starts with '*', `dp[0][index]` is set to `dp[0][index - 1]`, allowing '*' to match zero characters.
+
+2. **Iteration:**
+   - The code iterates through each character of `s` and `p`. 
+   - If the current characters match or `p` has a '?', `dp[i][j]` is set to `dp[i - 1][j - 1]`, indicating a successful match.
+   - If `p` has a '*', two possibilities are considered:
+      -  `dp[i][j]` is set to `dp[i][j - 1]`, allowing '*' to match zero characters.
+      -  `dp[i][j]` is set to `dp[i - 1][j]`, allowing '*' to match one or more characters.
+   - Otherwise, the match fails (`dp[i][j] = False`).
+
+3. **Result:**
+   - Finally, `dp[len(s)][len(p)]` holds the result, indicating whether the entire string matches the pattern.

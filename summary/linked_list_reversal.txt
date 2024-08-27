@@ -1,0 +1,7 @@
+The Python code defines two functions: `reverseKGroup` and `reverse`. 
+
+`reverseKGroup` takes the head of a linked list and an integer `k` as input. It aims to reverse the nodes of the linked list in groups of size `k`.  It iterates through the list, identifying groups of `k` nodes. For each group, it calls the `reverse` function to reverse the order of nodes within that group. The modified list is then returned.
+
+The `reverse` function takes the head of a linked list and the number of nodes to reverse (`count`) as input. It reverses the links of the given nodes in-place.  It iterates through the nodes, changing the `next` pointer of each node to point to the previous node, effectively reversing the direction of the links.
+
+The code handles cases where the length of the list is not a multiple of `k` by stopping the reversal process when it encounters fewer than `k` nodes remaining.
